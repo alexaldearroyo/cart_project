@@ -11,8 +11,13 @@ type Product = {
 
 export default function ProductList() {
   const [products, setProducts] = useState<Product[]>([]);
-  const [cart, setCart] = useState<Product[]>([]);
-  const total = cart.reduce((sum, item) => sum + item.price, 0);
+  const [cart, setCart] = useState<
+    Record<string, { product: Product; quantity: number }>
+  >({});
+  const total = Object.values(cart).reduce(
+    (sum, { product, quantity }) => sum + Number(product.price) * quantity,
+    0,
+  );
 
   useEffect(() => {
     axios
@@ -22,7 +27,15 @@ export default function ProductList() {
   }, []);
 
   const addToCart = (product: Product) => {
-    setCart([...cart, product]);
+    setCart((prevCart) => {
+      const existing = prevCart[product.code];
+      return {
+        ...prevCart,
+        [product.code]: existing
+          ? { product, quantity: existing.quantity + 1 }
+          : { product, quantity: 1 },
+      };
+    });
   };
 
   return (
@@ -40,9 +53,10 @@ export default function ProductList() {
       </ul>
       <h2>Cart</h2>
       <ul>
-        {cart.map((item, index) => (
-          <li key={index}>
-            {item.name} ({item.code}) - {item.price.toFixed(2)} €
+        {Object.values(cart).map(({ product, quantity }) => (
+          <li key={product.code}>
+            {product.name} ({product.code}) x {quantity} →{' '}
+            {(product.price * quantity).toFixed(2)} €
           </li>
         ))}
       </ul>
