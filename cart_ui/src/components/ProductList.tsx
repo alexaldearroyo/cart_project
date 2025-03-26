@@ -13,7 +13,14 @@ export default function ProductList() {
   const [products, setProducts] = useState<Product[]>([]);
   const [cart, setCart] = useState<
     Record<string, { product: Product; quantity: number }>
-  >({});
+  >(() => {
+    const saved = localStorage.getItem('cart');
+    return saved ? JSON.parse(saved) : {};
+  });
+
+  useEffect(() => {
+    localStorage.setItem('cart', JSON.stringify(cart));
+  }, [cart]);
 
   const calculateItemTotal = (product: Product, quantity: number): number => {
     switch (product.code) {
@@ -35,6 +42,12 @@ export default function ProductList() {
       default:
         return Number(product.price) * quantity;
     }
+  };
+
+  const calculateDiscount = (product: Product, quantity: number): number => {
+    const originalTotal = Number(product.price) * quantity;
+    const discountedTotal = calculateItemTotal(product, quantity);
+    return originalTotal - discountedTotal;
   };
 
   const total = Object.values(cart).reduce(
@@ -82,6 +95,11 @@ export default function ProductList() {
     });
   };
 
+  const clearCart = () => {
+    setCart({});
+    localStorage.removeItem('cart');
+  };
+
   return (
     <div>
       <h2>Products</h2>
@@ -95,22 +113,36 @@ export default function ProductList() {
           </li>
         ))}
       </ul>
+
       <h2>Cart</h2>
       <ul>
-        {Object.values(cart).map(({ product, quantity }) => (
-          <li key={product.code}>
-            {product.name} ({product.code}) x {quantity} →{' '}
-            {calculateItemTotal(product, quantity).toFixed(2)} €
-            <button
-              onClick={() => removeFromCart(product)}
-              style={{ marginLeft: '1rem' }}
-            >
-              −
-            </button>
-          </li>
-        ))}
+        {Object.values(cart).map(({ product, quantity }) => {
+          const subtotal = calculateItemTotal(product, quantity);
+          const discount = calculateDiscount(product, quantity);
+          return (
+            <li key={product.code}>
+              {product.name} ({product.code}) x {quantity} →{' '}
+              {subtotal.toFixed(2)} €
+              {discount > 0 && (
+                <span style={{ color: 'green', marginLeft: '0.5rem' }}>
+                  (−{discount.toFixed(2)} € discount)
+                </span>
+              )}
+              <button
+                onClick={() => removeFromCart(product)}
+                style={{ marginLeft: '1rem' }}
+              >
+                −
+              </button>
+            </li>
+          );
+        })}
       </ul>
+
       <h3>Total: {total.toFixed(2)} €</h3>
+      <button onClick={clearCart} style={{ marginTop: '1rem' }}>
+        Clear Cart
+      </button>
     </div>
   );
 }
