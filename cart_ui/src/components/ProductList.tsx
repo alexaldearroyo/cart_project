@@ -38,6 +38,27 @@ export default function ProductList() {
     });
   };
 
+  const removeFromCart = (product: Product) => {
+    setCart((prevCart) => {
+      const existing = prevCart[product.code];
+      if (!existing) return prevCart;
+
+      if (existing.quantity === 1) {
+        const updated = { ...prevCart };
+        delete updated[product.code];
+        return updated;
+      }
+
+      return {
+        ...prevCart,
+        [product.code]: {
+          product,
+          quantity: existing.quantity - 1,
+        },
+      };
+    });
+  };
+
   return (
     <div>
       <h2>Products</h2>
@@ -57,6 +78,12 @@ export default function ProductList() {
           <li key={product.code}>
             {product.name} ({product.code}) x {quantity} →{' '}
             {(product.price * quantity).toFixed(2)} €
+            <button
+              onClick={() => removeFromCart(product)}
+              style={{ marginLeft: '1rem' }}
+            >
+              −
+            </button>
           </li>
         ))}
       </ul>
