@@ -14,8 +14,31 @@ export default function ProductList() {
   const [cart, setCart] = useState<
     Record<string, { product: Product; quantity: number }>
   >({});
+
+  const calculateItemTotal = (product: Product, quantity: number): number => {
+    switch (product.code) {
+      case 'GR1': {
+        const payable = Math.ceil(quantity / 2);
+        return Number(product.price) * payable;
+      }
+      case 'SR1': {
+        const pricePerUnit = quantity >= 3 ? 4.5 : Number(product.price);
+        return pricePerUnit * quantity;
+      }
+      case 'CF1': {
+        const discountPrice =
+          quantity >= 3
+            ? Number(product.price) * (2 / 3)
+            : Number(product.price);
+        return discountPrice * quantity;
+      }
+      default:
+        return Number(product.price) * quantity;
+    }
+  };
+
   const total = Object.values(cart).reduce(
-    (sum, { product, quantity }) => sum + Number(product.price) * quantity,
+    (sum, { product, quantity }) => sum + calculateItemTotal(product, quantity),
     0,
   );
 
@@ -77,7 +100,7 @@ export default function ProductList() {
         {Object.values(cart).map(({ product, quantity }) => (
           <li key={product.code}>
             {product.name} ({product.code}) x {quantity} →{' '}
-            {(product.price * quantity).toFixed(2)} €
+            {calculateItemTotal(product, quantity).toFixed(2)} €
             <button
               onClick={() => removeFromCart(product)}
               style={{ marginLeft: '1rem' }}
