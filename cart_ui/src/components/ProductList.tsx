@@ -77,7 +77,7 @@ export default function ProductList() {
     localStorage.removeItem('cart');
   };
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (Object.keys(cart).length === 0) {
       alert('The cart is empty.');
       return;
@@ -85,7 +85,7 @@ export default function ProductList() {
 
     let summary = 'Order summary:\n\n';
 
-    Object.values(cart).forEach(({ product, quantity }) => {
+    const orderItems = Object.values(cart).map(({ product, quantity }) => {
       const subtotal = applyPricingRules(product, quantity);
       const discount = calculateDiscount(product, quantity);
       summary += `${product.name} x${quantity} → ${subtotal.toFixed(2)} €`;
@@ -93,11 +93,30 @@ export default function ProductList() {
         summary += ` (−${discount.toFixed(2)} € discount)`;
       }
       summary += '\n';
+      return { code: product.code, quantity };
     });
 
-    summary += `\nTOTAL: ${total.toFixed(2)} €`;
+    const total = Object.values(cart).reduce(
+      (sum, { product, quantity }) =>
+        sum + applyPricingRules(product, quantity),
+      0,
+    );
 
+    summary += `\nTOTAL: ${total.toFixed(2)} €`;
     alert(summary);
+
+    try {
+      await axios.post('http://localhost:3000/orders', {
+        order: {
+          items: JSON.stringify(orderItems),
+          total: total.toFixed(2),
+        },
+      });
+      alert('Order saved successfully.');
+    } catch (err) {
+      console.error('Failed to save order', err);
+      alert('Error saving order.');
+    }
 
     setCart({});
     localStorage.removeItem('cart');

@@ -115,6 +115,7 @@
 
 .cart-item-price {
   font-weight: 600;
+  margin-right: 1rem; /* Added margin to create space */
 }
 
 .discount {
@@ -124,7 +125,9 @@
 
 .cart-actions {
   display: flex;
-  gap: 0.5rem;
+  flex-direction: column; /* stack vertically */
+  gap: 0.25rem;
+  align-items: center;
 }
 
 .cart-summary {
@@ -144,6 +147,7 @@
   display: flex;
   gap: 1rem;
   margin-top: 1rem;
+  justify-content: center;
 }
 
 .btn {
