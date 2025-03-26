@@ -3,6 +3,16 @@ import { useEffect, useState } from 'react';
 import { Product } from '../types';
 import { applyPricingRules, calculateDiscount } from '../utils/pricingEngine';
 import axios from 'axios';
+import './ProductList.css';
+import {
+  FiShoppingCart,
+  FiPlus,
+  FiMinus,
+  FiTrash2,
+  FiCheckCircle,
+  FiPackage,
+  FiTag,
+} from 'react-icons/fi';
 
 export default function ProductList() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -94,54 +104,98 @@ export default function ProductList() {
   };
 
   return (
-    <div>
-      <h2>Products</h2>
-      <ul>
-        {products.map((p) => (
-          <li key={p.id}>
-            {p.name} ({p.code}) - {Number(p.price).toFixed(2)} €
-            <button onClick={() => addToCart(p)} style={{ marginLeft: '1rem' }}>
-              Add to Cart
-            </button>
-          </li>
-        ))}
-      </ul>
-
-      <h2>Cart</h2>
-      <ul>
-        {Object.values(cart).map(({ product, quantity }) => {
-          const subtotal = applyPricingRules(product, quantity);
-          const discount = calculateDiscount(product, quantity);
-          return (
-            <li key={product.code}>
-              {product.name} ({product.code}) x {quantity} →{' '}
-              {subtotal.toFixed(2)} €
-              {discount > 0 && (
-                <span style={{ color: 'green', marginLeft: '0.5rem' }}>
-                  (−{discount.toFixed(2)} € discount)
-                </span>
-              )}
-              <button
-                onClick={() => removeFromCart(product)}
-                style={{ marginLeft: '1rem' }}
-              >
-                −
+    <div className="product-container">
+      <section className="product-section">
+        <h2 className="section-title">
+          <FiPackage className="icon" /> Products
+        </h2>
+        <ul className="product-list">
+          {products.map((p) => (
+            <li key={p.id} className="product-item">
+              <div className="product-info">
+                <div className="product-name">{p.name}</div>
+                <div className="product-code">
+                  <FiTag className="icon-sm" /> {p.code}
+                </div>
+                <div className="product-price">
+                  {Number(p.price).toFixed(2)} €
+                </div>
+              </div>
+              <button className="btn btn-primary" onClick={() => addToCart(p)}>
+                <FiShoppingCart className="icon-sm" /> Add to Cart
               </button>
             </li>
-          );
-        })}
-      </ul>
+          ))}
+        </ul>
+      </section>
 
-      <h3>Total: {total.toFixed(2)} €</h3>
-      <button onClick={clearCart} style={{ marginTop: '1rem' }}>
-        Clear Cart
-      </button>
-      <button
-        onClick={handleCheckout}
-        style={{ marginTop: '1rem', marginLeft: '1rem' }}
-      >
-        Checkout
-      </button>
+      <section className="cart-section">
+        <h2 className="section-title">
+          <FiShoppingCart className="icon" /> Shopping Cart
+        </h2>
+
+        {Object.keys(cart).length === 0 ? (
+          <div className="empty-cart">Your cart is empty</div>
+        ) : (
+          <>
+            <ul className="cart-list">
+              {Object.values(cart).map(({ product, quantity }) => {
+                const subtotal = applyPricingRules(product, quantity);
+                const discount = calculateDiscount(product, quantity);
+                return (
+                  <li key={product.code} className="cart-item">
+                    <div className="cart-item-info">
+                      <div className="cart-item-name">{product.name}</div>
+                      <div className="cart-item-details">
+                        <span className="cart-item-code">
+                          <FiTag className="icon-sm" /> {product.code}
+                        </span>
+                        <span className="cart-item-quantity">{quantity}</span>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="cart-item-price">
+                        {subtotal.toFixed(2)} €
+                      </div>
+                      {discount > 0 && (
+                        <div className="discount">
+                          −{discount.toFixed(2)} € discount
+                        </div>
+                      )}
+                    </div>
+                    <div className="cart-actions">
+                      <button
+                        className="btn btn-sm btn-danger"
+                        onClick={() => removeFromCart(product)}
+                      >
+                        <FiMinus />
+                      </button>
+                      <button
+                        className="btn btn-sm btn-primary"
+                        onClick={() => addToCart(product)}
+                      >
+                        <FiPlus />
+                      </button>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+
+            <div className="cart-summary">
+              <div className="cart-total">Total: {total.toFixed(2)} €</div>
+              <div className="cart-buttons">
+                <button className="btn btn-danger" onClick={clearCart}>
+                  <FiTrash2 className="icon-sm" /> Clear Cart
+                </button>
+                <button className="btn btn-success" onClick={handleCheckout}>
+                  <FiCheckCircle className="icon-sm" /> Checkout
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+      </section>
     </div>
   );
 }
