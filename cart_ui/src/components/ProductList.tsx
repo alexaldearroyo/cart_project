@@ -1,13 +1,8 @@
 // src/components/ProductList.tsx
 import { useEffect, useState } from 'react';
+import { Product } from '../types';
+import { applyPricingRules, calculateDiscount } from '../utils/pricingEngine';
 import axios from 'axios';
-
-type Product = {
-  id: number;
-  code: string;
-  name: string;
-  price: number;
-};
 
 export default function ProductList() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -22,36 +17,8 @@ export default function ProductList() {
     localStorage.setItem('cart', JSON.stringify(cart));
   }, [cart]);
 
-  const calculateItemTotal = (product: Product, quantity: number): number => {
-    switch (product.code) {
-      case 'GR1': {
-        const payable = Math.ceil(quantity / 2);
-        return Number(product.price) * payable;
-      }
-      case 'SR1': {
-        const pricePerUnit = quantity >= 3 ? 4.5 : Number(product.price);
-        return pricePerUnit * quantity;
-      }
-      case 'CF1': {
-        const discountPrice =
-          quantity >= 3
-            ? Number(product.price) * (2 / 3)
-            : Number(product.price);
-        return discountPrice * quantity;
-      }
-      default:
-        return Number(product.price) * quantity;
-    }
-  };
-
-  const calculateDiscount = (product: Product, quantity: number): number => {
-    const originalTotal = Number(product.price) * quantity;
-    const discountedTotal = calculateItemTotal(product, quantity);
-    return originalTotal - discountedTotal;
-  };
-
   const total = Object.values(cart).reduce(
-    (sum, { product, quantity }) => sum + calculateItemTotal(product, quantity),
+    (sum, { product, quantity }) => sum + applyPricingRules(product, quantity),
     0,
   );
 
@@ -100,6 +67,32 @@ export default function ProductList() {
     localStorage.removeItem('cart');
   };
 
+  const handleCheckout = () => {
+    if (Object.keys(cart).length === 0) {
+      alert('The cart is empty.');
+      return;
+    }
+
+    let summary = 'Order summary:\n\n';
+
+    Object.values(cart).forEach(({ product, quantity }) => {
+      const subtotal = applyPricingRules(product, quantity);
+      const discount = calculateDiscount(product, quantity);
+      summary += `${product.name} x${quantity} → ${subtotal.toFixed(2)} €`;
+      if (discount > 0) {
+        summary += ` (−${discount.toFixed(2)} € discount)`;
+      }
+      summary += '\n';
+    });
+
+    summary += `\nTOTAL: ${total.toFixed(2)} €`;
+
+    alert(summary);
+
+    setCart({});
+    localStorage.removeItem('cart');
+  };
+
   return (
     <div>
       <h2>Products</h2>
@@ -117,7 +110,7 @@ export default function ProductList() {
       <h2>Cart</h2>
       <ul>
         {Object.values(cart).map(({ product, quantity }) => {
-          const subtotal = calculateItemTotal(product, quantity);
+          const subtotal = applyPricingRules(product, quantity);
           const discount = calculateDiscount(product, quantity);
           return (
             <li key={product.code}>
@@ -142,6 +135,12 @@ export default function ProductList() {
       <h3>Total: {total.toFixed(2)} €</h3>
       <button onClick={clearCart} style={{ marginTop: '1rem' }}>
         Clear Cart
+      </button>
+      <button
+        onClick={handleCheckout}
+        style={{ marginTop: '1rem', marginLeft: '1rem' }}
+      >
+        Checkout
       </button>
     </div>
   );
