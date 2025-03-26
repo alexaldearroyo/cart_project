@@ -1,8 +1,7 @@
-#!/bin/bash -e
+#!/bin/bash
+set -e
 
-# If running the rails server then create or migrate existing database
-if [ "${1}" == "./bin/rails" ] && [ "${2}" == "server" ]; then
-  ./bin/rails db:prepare
-fi
+# Ensure database is up to date
+bundle exec rails db:migrate 2>/dev/null || bundle exec rails db:setup
 
-exec "${@}"
+exec "$@"

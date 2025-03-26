@@ -2,6 +2,11 @@
 
 Full-stack shopping cart app built with **Ruby on Rails** (API-only) and **React** (TypeScript).
 
+**🟢 Live Demo:**
+
+- Frontend: https://cart-ui.fly.dev
+- Backend API: https://cart-app-broken-glade-4898.fly.dev/products
+
 ---
 
 ## 🧱 Stack
@@ -14,7 +19,7 @@ Full-stack shopping cart app built with **Ruby on Rails** (API-only) and **React
 
 ---
 
-## 🚀 How to Run
+## ✨ How to Run
 
 ### 1. Backend (Rails API)
 
@@ -83,7 +88,7 @@ cart_project/
 
 ## 💡 Notes
 
-- CORS is configured to allow requests from `localhost:3001`
+- CORS is configured to allow requests from deployed frontend
 - Rails orders are saved to the DB (basic Order model with items JSON)
 - Easily extendable for new pricing rules (modular engine in `pricingEngine.ts`)
 

@@ -47,5 +47,8 @@
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     }
+  },
+  "devDependencies": {
+    "@flydotio/dockerfile": "^0.7.9"
   }
 }

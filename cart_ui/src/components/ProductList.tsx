@@ -22,7 +22,7 @@ export default function ProductList() {
 
   useEffect(() => {
     axios
-      .get('http://localhost:3000/products')
+      .get(`${process.env.REACT_APP_API_URL}/products`)
       .then((res) => setProducts(res.data))
       .catch((err) => console.error('Error fetching products', err));
   }, []);
@@ -94,7 +94,7 @@ export default function ProductList() {
     alert(summary);
 
     try {
-      await axios.post('http://localhost:3000/orders', {
+      await axios.post(`${process.env.REACT_APP_API_URL}/orders`, {
         order: {
           items: JSON.stringify(orderItems),
           total: total.toFixed(2),
