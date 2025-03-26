@@ -1,0 +1,60 @@
+# Root-level .gitignore for cart_project
+
+# macOS
+.DS_Store
+
+# ===========================
+# cart_ui (React frontend)
+# ===========================
+
+# dependencies
+cart_ui/node_modules
+cart_ui/.pnp
+cart_ui/.pnp.js
+
+# testing
+cart_ui/coverage
+
+# production
+cart_ui/build
+cart_ui/.next
+cart_ui/dist
+
+# env files
+cart_ui/.env
+cart_ui/.env.local
+cart_ui/.env.development.local
+cart_ui/.env.test.local
+cart_ui/.env.production.local
+
+# logs
+cart_ui/npm-debug.log*
+cart_ui/yarn-debug.log*
+cart_ui/yarn-error.log*
+
+# ===========================
+# cart_app (Rails backend)
+# ===========================
+
+# Rails folders
+cart_app/log/*
+cart_app/tmp/*
+cart_app/.bundle
+cart_app/vendor/bundle
+
+# DB + secrets
+cart_app/db/*.sqlite3
+cart_app/db/*.sqlite3-journal
+cart_app/.env
+cart_app/.byebug_history
+
+# ===========================
+# General / test artifacts
+# ===========================
+
+*.swp
+*.swo
+*.bak
+*.log
+*.tmp
+**/cs_*.txt

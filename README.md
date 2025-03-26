@@ -1,7 +1,6 @@
 # 🛒 Cart App
 
-Full-stack shopping cart app built with **Ruby on Rails (API-only)** and **React** (Vite + TypeScript).  
-This project was developed as part of a technical assignment.
+Full-stack shopping cart app built with **Ruby on Rails** (API-only) and **React** (TypeScript).
 
 ---
 
